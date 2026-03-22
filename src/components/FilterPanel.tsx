@@ -1,3 +1,5 @@
+import { createContext, useContext } from 'react';
+import type { ReactNode } from 'react';
 import { css } from '@emotion/react';
 import { Spacing, Text, Select } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
@@ -23,23 +25,32 @@ type FilterHandlers = {
   onPreferredFloorChange: (value: number | null) => void;
 };
 
-type FilterPanelProps = FilterValues & FilterHandlers & {
-  floors: number[];
-  validationError: string | null;
+type FilterContext = FilterValues & FilterHandlers;
+
+const FilterPanelContext = createContext<FilterContext | null>(null);
+
+function useFilterPanel() {
+  const ctx = useContext(FilterPanelContext);
+  if (!ctx) throw new Error('FilterPanel 서브 컴포넌트는 FilterPanel 내부에서 사용해야 합니다.');
+  return ctx;
+}
+
+type FilterPanelProps = FilterContext & {
+  children: ReactNode;
 };
 
-function DateField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function DateField() {
+  const { date, onDateChange } = useFilterPanel();
   return (
     <div css={css`display: flex; flex-direction: column; gap: 6px;`}>
       <Text as="label" typography="t7" fontWeight="medium" color={colors.grey600}>날짜</Text>
-      <DatePicker value={value} onChange={onChange} showReset />
+      <DatePicker value={date} onChange={onDateChange} showReset />
     </div>
   );
 }
 
-function TimeFields({
-  startTime, endTime, onStartTimeChange, onEndTimeChange,
-}: Pick<FilterPanelProps, 'startTime' | 'endTime' | 'onStartTimeChange' | 'onEndTimeChange'>) {
+function TimeFields() {
+  const { startTime, endTime, onStartTimeChange, onEndTimeChange } = useFilterPanel();
   return (
     <div css={css`display: flex; gap: 12px;`}>
       <div css={css`display: flex; flex-direction: column; gap: 6px; flex: 1;`}>
@@ -72,9 +83,8 @@ function TimeFields({
   );
 }
 
-function AttendeesAndFloor({
-  attendees, preferredFloor, floors, onAttendeesChange, onPreferredFloorChange,
-}: Pick<FilterPanelProps, 'attendees' | 'preferredFloor' | 'floors' | 'onAttendeesChange' | 'onPreferredFloorChange'>) {
+function AttendeesAndFloor({ floors }: { floors: number[] }) {
+  const { attendees, preferredFloor, onAttendeesChange, onPreferredFloorChange } = useFilterPanel();
   return (
     <div css={css`display: flex; gap: 12px;`}>
       <div css={css`display: flex; flex-direction: column; gap: 6px; flex: 1;`}>
@@ -114,9 +124,8 @@ function AttendeesAndFloor({
   );
 }
 
-function EquipmentSelector({
-  equipment, onEquipmentChange,
-}: Pick<FilterPanelProps, 'equipment' | 'onEquipmentChange'>) {
+function EquipmentSelector() {
+  const { equipment, onEquipmentChange } = useFilterPanel();
   return (
     <div>
       <Text as="label" typography="t7" fontWeight="medium" color={colors.grey600}>필요 장비</Text>
@@ -163,39 +172,19 @@ function ValidationError({ message }: { message: string | null }) {
 }
 
 export function FilterPanel({
+  children,
   date, startTime, endTime, attendees, equipment, preferredFloor,
-  floors, validationError,
   onDateChange, onStartTimeChange, onEndTimeChange,
   onAttendeesChange, onEquipmentChange, onPreferredFloorChange,
 }: FilterPanelProps) {
   return (
-    <>
-      <div css={css`padding: 0 24px;`}>
-        <Text typography="t5" fontWeight="bold" color={colors.grey900}>
-          예약 조건
-        </Text>
-        <Spacing size={16} />
-        <DateField value={date} onChange={onDateChange} />
-        <Spacing size={14} />
-        <TimeFields
-          startTime={startTime}
-          endTime={endTime}
-          onStartTimeChange={onStartTimeChange}
-          onEndTimeChange={onEndTimeChange}
-        />
-        <Spacing size={14} />
-        <AttendeesAndFloor
-          attendees={attendees}
-          preferredFloor={preferredFloor}
-          floors={floors}
-          onAttendeesChange={onAttendeesChange}
-          onPreferredFloorChange={onPreferredFloorChange}
-        />
-        <Spacing size={14} />
-        <EquipmentSelector equipment={equipment} onEquipmentChange={onEquipmentChange} />
-      </div>
-      <ValidationError message={validationError} />
-    </>
+    <FilterPanelContext.Provider value={{
+      date, startTime, endTime, attendees, equipment, preferredFloor,
+      onDateChange, onStartTimeChange, onEndTimeChange,
+      onAttendeesChange, onEquipmentChange, onPreferredFloorChange,
+    }}>
+      {children}
+    </FilterPanelContext.Provider>
   );
 }
 

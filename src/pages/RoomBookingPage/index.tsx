@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
-import { Top, Spacing, Border } from '_tosslib/components';
+import { Top, Spacing, Border, Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import axios from 'axios';
 import { useErrorBoundary } from 'react-error-boundary';
@@ -18,17 +18,12 @@ export function RoomBookingPage() {
   const { showBoundary } = useErrorBoundary();
 
   const {
-    date, setDate,
-    startTime, setStartTime,
-    endTime, setEndTime,
-    attendees, setAttendees,
-    equipment, setEquipment,
-    preferredFloor, setPreferredFloor,
+    filterProps,
+    date, startTime, endTime, attendees, equipment, preferredFloor,
     selectedRoomId, setSelectedRoomId,
     errorMessage, setErrorMessage,
     validationError,
     isFilterComplete,
-    resetSelection,
   } = useBookingFilter();
 
   const { data: rooms = [] } = useRooms();
@@ -88,11 +83,6 @@ export function RoomBookingPage() {
     }
   };
 
-  const handleFilterField = <T,>(setter: (v: T) => void) => (value: T) => {
-    setter(value);
-    resetSelection();
-  };
-
   return (
     <div css={css`background: ${colors.white}; padding-bottom: 40px;`}>
       <div css={css`padding: 12px 24px 0;`}>
@@ -121,22 +111,22 @@ export function RoomBookingPage() {
 
       <Spacing size={24} />
 
-      <FilterPanel
-        date={date}
-        startTime={startTime}
-        endTime={endTime}
-        attendees={attendees}
-        equipment={equipment}
-        preferredFloor={preferredFloor}
-        floors={floors}
-        validationError={validationError}
-        onDateChange={handleFilterField(setDate)}
-        onStartTimeChange={handleFilterField(setStartTime)}
-        onEndTimeChange={handleFilterField(setEndTime)}
-        onAttendeesChange={handleFilterField(setAttendees)}
-        onEquipmentChange={handleFilterField(setEquipment)}
-        onPreferredFloorChange={handleFilterField(setPreferredFloor)}
-      />
+      <FilterPanel {...filterProps}>
+        <div css={css`padding: 0 24px;`}>
+          <Text typography="t5" fontWeight="bold" color={colors.grey900}>
+            예약 조건
+          </Text>
+          <Spacing size={16} />
+          <FilterPanel.DateField />
+          <Spacing size={14} />
+          <FilterPanel.TimeFields />
+          <Spacing size={14} />
+          <FilterPanel.AttendeesAndFloor floors={floors} />
+          <Spacing size={14} />
+          <FilterPanel.EquipmentSelector />
+        </div>
+        <FilterPanel.ValidationError message={validationError} />
+      </FilterPanel>
 
       <Spacing size={24} />
       <Border size={8} />

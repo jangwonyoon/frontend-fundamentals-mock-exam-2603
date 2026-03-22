@@ -57,13 +57,29 @@ export function useBookingFilter() {
   }
   const isFilterComplete = hasTimeInputs && !validationError;
 
+  const withReset = <T,>(setter: (v: T) => void) => (value: T) => {
+    setter(value);
+    resetSelection();
+  };
+
+  const filterProps = {
+    date,
+    startTime,
+    endTime,
+    attendees,
+    equipment,
+    preferredFloor,
+    onDateChange: withReset(setDate),
+    onStartTimeChange: withReset(setStartTime),
+    onEndTimeChange: withReset(setEndTime),
+    onAttendeesChange: withReset(setAttendees),
+    onEquipmentChange: withReset(setEquipment),
+    onPreferredFloorChange: withReset(setPreferredFloor),
+  };
+
   return {
-    date, setDate,
-    startTime, setStartTime,
-    endTime, setEndTime,
-    attendees, setAttendees,
-    equipment, setEquipment,
-    preferredFloor, setPreferredFloor,
+    filterProps,
+    date, startTime, endTime, attendees, equipment, preferredFloor,
     selectedRoomId, setSelectedRoomId,
     errorMessage, setErrorMessage,
     validationError,
