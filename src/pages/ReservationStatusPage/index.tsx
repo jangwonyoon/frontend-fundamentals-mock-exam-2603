@@ -8,7 +8,7 @@ import { colors } from '_tosslib/constants/colors';
 import { useRooms } from 'hooks/useRooms';
 import { useReservations } from 'hooks/useReservations';
 import { useMyReservations } from 'hooks/useMyReservations';
-import { formatDate } from 'shared/utils';
+import { useDateParam } from 'hooks/useDateParam';
 import { DatePicker } from 'components/DatePicker';
 import { Timeline } from 'components/Timeline';
 import { MyReservations } from 'components/MyReservations';
@@ -18,7 +18,7 @@ export function ReservationStatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showBoundary } = useErrorBoundary();
-  const [date, setDate] = useState(formatDate(new Date()));
+  const [date, setDate] = useDateParam();
 
   const locationState: unknown = location.state;
   const initialMessage = (() => {
@@ -68,7 +68,7 @@ export function ReservationStatusPage() {
           날짜 선택
         </Text>
         <Spacing size={16} />
-        <DatePicker value={date} onChange={setDate} />
+        <DatePicker value={date} onChange={setDate} showReset />
       </div>
 
       <Spacing size={24} />

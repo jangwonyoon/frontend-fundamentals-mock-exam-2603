@@ -1,21 +1,33 @@
 import { css } from '@emotion/react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import { EQUIPMENT_LABELS, HOUR_LABELS, TOTAL_MINUTES } from 'shared/constants';
+import { useClickOutside } from 'hooks/useClickOutside';
 import { timeToMinutes } from 'shared/utils';
 import type { Room, Reservation } from 'shared/types';
 
-interface TimelineProps {
+type TimelineProps = {
   rooms: Room[];
   reservations: Reservation[];
-}
+};
 
 export function Timeline({ rooms, reservations }: TimelineProps) {
   const [activeReservation, setActiveReservation] = useState<string | null>(null);
+  const containerRef = useClickOutside<HTMLDivElement>(
+    useCallback(() => setActiveReservation(null), [])
+  );
 
   return (
-    <div css={css`background: ${colors.grey50}; border-radius: 14px; padding: 16px;`}>
+    <div
+      ref={containerRef}
+      onClick={(e) => {
+        if (!(e.target as HTMLElement).closest('[role="button"]')) {
+          setActiveReservation(null);
+        }
+      }}
+      css={css`background: ${colors.grey50}; border-radius: 14px; padding: 16px;`}
+    >
       {/* 시간 헤더 */}
       <div css={css`display: flex; align-items: flex-end; margin-bottom: 8px;`}>
         <div css={css`width: 80px; flex-shrink: 0; padding-right: 8px;`} />
