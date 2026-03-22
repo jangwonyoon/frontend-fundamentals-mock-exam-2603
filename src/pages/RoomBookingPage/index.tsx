@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Top, Spacing, Border } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import axios from 'axios';
+import { useErrorBoundary } from 'react-error-boundary';
 import { useRooms } from 'hooks/useRooms';
 import { useReservations } from 'hooks/useReservations';
 import { useCreateReservation } from 'hooks/useCreateReservation';
@@ -14,6 +15,7 @@ import { filterAvailableRooms } from 'shared/utils';
 
 export function RoomBookingPage() {
   const navigate = useNavigate();
+  const { showBoundary } = useErrorBoundary();
 
   const {
     date, setDate,
@@ -69,18 +71,20 @@ export function RoomBookingPage() {
       setErrorMessage(result.message ?? '예약에 실패했습니다.');
       setSelectedRoomId(null);
     } catch (err: unknown) {
-      let serverMessage = '예약에 실패했습니다.';
       if (axios.isAxiosError(err) && err.response?.data != null) {
         const data: unknown = err.response.data;
+        let serverMessage = '예약에 실패했습니다.';
         if (typeof data === 'object' && data !== null && 'message' in data) {
           const msg = (data as Record<string, unknown>).message;
           if (typeof msg === 'string') {
             serverMessage = msg;
           }
         }
+        setErrorMessage(serverMessage);
+        setSelectedRoomId(null);
+        return;
       }
-      setErrorMessage(serverMessage);
-      setSelectedRoomId(null);
+      showBoundary(err);
     }
   };
 
