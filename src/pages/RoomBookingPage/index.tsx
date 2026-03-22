@@ -70,9 +70,14 @@ export function RoomBookingPage() {
       setSelectedRoomId(null);
     } catch (err: unknown) {
       let serverMessage = '예약에 실패했습니다.';
-      if (axios.isAxiosError(err)) {
-        const data = err.response?.data as { message?: string } | undefined;
-        serverMessage = data?.message ?? serverMessage;
+      if (axios.isAxiosError(err) && err.response?.data != null) {
+        const data: unknown = err.response.data;
+        if (typeof data === 'object' && data !== null && 'message' in data) {
+          const msg = (data as Record<string, unknown>).message;
+          if (typeof msg === 'string') {
+            serverMessage = msg;
+          }
+        }
       }
       setErrorMessage(serverMessage);
       setSelectedRoomId(null);

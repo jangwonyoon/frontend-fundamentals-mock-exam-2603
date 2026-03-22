@@ -43,6 +43,13 @@ export function AvailableRoomList({ rooms, selectedRoomId, isLoading, onSelectRo
                 key={room.id}
                 onClick={() => onSelectRoom(room.id)}
                 role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onSelectRoom(room.id);
+                  }
+                }}
                 aria-pressed={isSelected}
                 aria-label={room.name}
                 css={css`

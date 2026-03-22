@@ -13,14 +13,14 @@ export function timeToMinutes(time: string): number {
   return (h - TIMELINE_START) * 60 + m;
 }
 
-interface RoomFilterCriteria {
+type RoomFilterCriteria = {
   date: string;
   startTime: string;
   endTime: string;
   attendees: number;
   equipment: Equipment[];
   preferredFloor: number | null;
-}
+};
 
 export function filterAvailableRooms(
   rooms: Room[],

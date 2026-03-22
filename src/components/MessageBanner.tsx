@@ -9,7 +9,7 @@ interface MessageBannerProps {
 
 export function MessageBanner({ type, text }: MessageBannerProps) {
   return (
-    <div css={css`padding: 0 24px;`}>
+    <div role="alert" css={css`padding: 0 24px;`}>
       <div
         css={css`
           padding: 10px 14px; border-radius: 10px;

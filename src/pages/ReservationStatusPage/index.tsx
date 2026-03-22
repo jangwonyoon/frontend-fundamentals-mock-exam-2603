@@ -17,16 +17,23 @@ export function ReservationStatusPage() {
   const location = useLocation();
   const [date, setDate] = useState(formatDate(new Date()));
 
-  const locationState = location.state as { message?: string } | null;
+  const locationState: unknown = location.state;
+  const initialMessage =
+    locationState != null &&
+    typeof locationState === 'object' &&
+    'message' in locationState &&
+    typeof (locationState as Record<string, unknown>).message === 'string'
+      ? (locationState as Record<string, unknown>).message as string
+      : null;
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(
-    locationState?.message ? { type: 'success', text: locationState.message } : null
+    initialMessage ? { type: 'success', text: initialMessage } : null
   );
 
   useEffect(() => {
-    if (locationState?.message) {
+    if (initialMessage) {
       window.history.replaceState({}, '');
     }
-  }, [locationState]);
+  }, [initialMessage]);
 
   const { data: rooms = [] } = useRooms();
   const { data: reservations = [] } = useReservations(date);

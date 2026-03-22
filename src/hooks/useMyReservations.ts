@@ -15,7 +15,9 @@ export function useMyReservations() {
   });
 
   return {
+    ...query,
     myReservations: query.data ?? [],
     cancel: cancelMutation.mutateAsync,
+    isCancelling: cancelMutation.isLoading,
   };
 }
