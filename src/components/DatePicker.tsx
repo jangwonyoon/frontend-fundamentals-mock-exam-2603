@@ -2,10 +2,10 @@ import { css } from '@emotion/react';
 import { colors } from '_tosslib/constants/colors';
 import { formatDate } from 'shared/utils';
 
-interface DatePickerProps {
+type DatePickerProps = {
   value: string;
   onChange: (value: string) => void;
-}
+};
 
 export function DatePicker({ value, onChange }: DatePickerProps) {
   return (

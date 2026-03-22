@@ -4,13 +4,13 @@ import { colors } from '_tosslib/constants/colors';
 import { EQUIPMENT_LABELS } from 'shared/constants';
 import type { Room } from 'shared/types';
 
-interface AvailableRoomListProps {
+type AvailableRoomListProps = {
   rooms: Room[];
   selectedRoomId: string | null;
   isLoading: boolean;
   onSelectRoom: (roomId: string) => void;
   onBook: () => void;
-}
+};
 
 const isBookingDisabled = (isLoading: boolean, selectedRoomId: string | null) =>
   isLoading || selectedRoomId == null;

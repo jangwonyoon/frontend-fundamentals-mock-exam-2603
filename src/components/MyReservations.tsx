@@ -4,11 +4,11 @@ import { colors } from '_tosslib/constants/colors';
 import { EQUIPMENT_LABELS } from 'shared/constants';
 import type { Room, Reservation } from 'shared/types';
 
-interface MyReservationsProps {
+type MyReservationsProps = {
   reservations: Reservation[];
   rooms: Room[];
   onCancel: (id: string) => void;
-}
+};
 
 export function MyReservations({ reservations, rooms, onCancel }: MyReservationsProps) {
   const getRoomName = (roomId: string) =>

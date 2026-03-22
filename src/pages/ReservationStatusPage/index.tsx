@@ -1,6 +1,8 @@
 import { css } from '@emotion/react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useErrorBoundary } from 'react-error-boundary';
+import axios from 'axios';
 import { Top, Spacing, Border, Button, Text } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import { useRooms } from 'hooks/useRooms';
@@ -15,16 +17,16 @@ import { MessageBanner } from 'components/MessageBanner';
 export function ReservationStatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showBoundary } = useErrorBoundary();
   const [date, setDate] = useState(formatDate(new Date()));
 
   const locationState: unknown = location.state;
-  const initialMessage =
-    locationState != null &&
-    typeof locationState === 'object' &&
-    'message' in locationState &&
-    typeof (locationState as Record<string, unknown>).message === 'string'
-      ? (locationState as Record<string, unknown>).message as string
-      : null;
+  const initialMessage = (() => {
+    if (locationState == null || typeof locationState !== 'object') return null;
+    if (!('message' in locationState)) return null;
+    const msg = (locationState as { message: unknown }).message;
+    return typeof msg === 'string' ? msg : null;
+  })();
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(
     initialMessage ? { type: 'success', text: initialMessage } : null
   );
@@ -43,8 +45,12 @@ export function ReservationStatusPage() {
     try {
       await cancel(id);
       setMessage({ type: 'success', text: '예약이 취소되었습니다.' });
-    } catch {
-      setMessage({ type: 'error', text: '취소에 실패했습니다.' });
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setMessage({ type: 'error', text: '취소에 실패했습니다.' });
+        return;
+      }
+      showBoundary(err);
     }
   };
 
