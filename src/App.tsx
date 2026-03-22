@@ -7,6 +7,7 @@ import { GlobalPortal } from './GlobalPortal';
 import '_tosslib/sass/app.scss';
 import { PageLayout } from 'pages/PageLayout';
 import { Routes } from 'pages/Routes';
+import { ErrorBoundary } from 'components/ErrorBoundary';
 
 export default function App() {
   const [queryClient] = useState(
@@ -34,9 +35,11 @@ export default function App() {
             }
           `}
         />
-        <PageLayout>
-          <Routes />
-        </PageLayout>
+        <ErrorBoundary>
+          <PageLayout>
+            <Routes />
+          </PageLayout>
+        </ErrorBoundary>
       </GlobalPortal.Provider>
     </QueryClientProvider>
   );
