@@ -1,15 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMyReservations, cancelReservation } from 'pages/remotes';
+import { queryKeys } from 'shared/queryKeys';
 
 export function useMyReservations() {
   const queryClient = useQueryClient();
 
-  const query = useQuery(['myReservations'], getMyReservations);
+  const query = useQuery(queryKeys.myReservations, getMyReservations);
 
-  const cancelMutation = useMutation((id: string) => cancelReservation(id), {
+  const cancelMutation = useMutation(cancelReservation, {
     onSuccess: () => {
-      queryClient.invalidateQueries(['reservations']);
-      queryClient.invalidateQueries(['myReservations']);
+      queryClient.invalidateQueries(queryKeys.reservations.all);
+      queryClient.invalidateQueries(queryKeys.myReservations);
     },
   });
 

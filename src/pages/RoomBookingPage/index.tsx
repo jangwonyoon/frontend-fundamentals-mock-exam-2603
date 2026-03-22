@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { useNavigate } from 'react-router-dom';
-import { Top, Spacing, Border, Text } from '_tosslib/components';
+import { Top, Spacing, Border } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import axios from 'axios';
 import { useRooms } from 'hooks/useRooms';
@@ -9,7 +9,8 @@ import { useCreateReservation } from 'hooks/useCreateReservation';
 import { useBookingFilter } from 'hooks/useBookingFilter';
 import { FilterPanel } from 'components/FilterPanel';
 import { AvailableRoomList } from 'components/AvailableRoomList';
-import type { Room, Reservation } from 'shared/types';
+import { MessageBanner } from 'components/MessageBanner';
+import { filterAvailableRooms } from 'shared/utils';
 
 export function RoomBookingPage() {
   const navigate = useNavigate();
@@ -32,25 +33,12 @@ export function RoomBookingPage() {
   const { data: reservations = [] } = useReservations(date);
   const createMutation = useCreateReservation();
 
-  const floors = [...new Set(rooms.map((r: Room) => r.floor))].sort((a, b) => a - b);
+  const floors = [...new Set(rooms.map(r => r.floor))].sort((a, b) => a - b);
 
   const availableRooms = isFilterComplete
-    ? rooms
-        .filter((room: Room) => {
-          if (room.capacity < attendees) return false;
-          if (!equipment.every(eq => room.equipment.includes(eq))) return false;
-          if (preferredFloor !== null && room.floor !== preferredFloor) return false;
-          const hasConflict = reservations.some(
-            (r: Reservation) =>
-              r.roomId === room.id && r.date === date && r.start < endTime && r.end > startTime
-          );
-          if (hasConflict) return false;
-          return true;
-        })
-        .sort((a: Room, b: Room) => {
-          if (a.floor !== b.floor) return a.floor - b.floor;
-          return a.name.localeCompare(b.name);
-        })
+    ? filterAvailableRooms(rooms, reservations, {
+        date, startTime, endTime, attendees, equipment, preferredFloor,
+      })
     : [];
 
   const handleBook = async () => {
@@ -73,13 +61,12 @@ export function RoomBookingPage() {
         equipment,
       });
 
-      if ('ok' in result && result.ok) {
+      if (result.ok) {
         navigate('/', { state: { message: '예약이 완료되었습니다!' } });
         return;
       }
 
-      const errResult = result as { message?: string };
-      setErrorMessage(errResult.message ?? '예약에 실패했습니다.');
+      setErrorMessage(result.message ?? '예약에 실패했습니다.');
       setSelectedRoomId(null);
     } catch (err: unknown) {
       let serverMessage = '예약에 실패했습니다.';
@@ -117,17 +104,10 @@ export function RoomBookingPage() {
       </Top.Top03>
 
       {errorMessage && (
-        <div css={css`padding: 0 24px;`}>
+        <>
           <Spacing size={12} />
-          <div
-            css={css`
-              padding: 10px 14px; border-radius: 10px; background: ${colors.red50};
-              display: flex; align-items: center; gap: 8px;
-            `}
-          >
-            <Text typography="t7" fontWeight="medium" color={colors.red500}>{errorMessage}</Text>
-          </div>
-        </div>
+          <MessageBanner type="error" text={errorMessage} />
+        </>
       )}
 
       <Spacing size={24} />

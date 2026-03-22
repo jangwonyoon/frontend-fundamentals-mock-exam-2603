@@ -2,7 +2,7 @@ import { css } from '@emotion/react';
 import { Spacing, Text, Select } from '_tosslib/components';
 import { colors } from '_tosslib/constants/colors';
 import { EQUIPMENT_LABELS, ALL_EQUIPMENT, TIME_SLOTS } from 'shared/constants';
-import { formatDate } from 'shared/utils';
+import type { Equipment } from 'shared/types';
 import { DatePicker } from './DatePicker';
 
 interface FilterPanelProps {
@@ -10,7 +10,7 @@ interface FilterPanelProps {
   startTime: string;
   endTime: string;
   attendees: number;
-  equipment: string[];
+  equipment: Equipment[];
   preferredFloor: number | null;
   floors: number[];
   validationError: string | null;
@@ -18,7 +18,7 @@ interface FilterPanelProps {
   onStartTimeChange: (value: string) => void;
   onEndTimeChange: (value: string) => void;
   onAttendeesChange: (value: number) => void;
-  onEquipmentChange: (value: string[]) => void;
+  onEquipmentChange: (value: Equipment[]) => void;
   onPreferredFloorChange: (value: number | null) => void;
 }
 

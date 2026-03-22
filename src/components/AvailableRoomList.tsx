@@ -12,6 +12,9 @@ interface AvailableRoomListProps {
   onBook: () => void;
 }
 
+const isBookingDisabled = (isLoading: boolean, selectedRoomId: string | null) =>
+  isLoading || selectedRoomId == null;
+
 export function AvailableRoomList({ rooms, selectedRoomId, isLoading, onSelectRoom, onBook }: AvailableRoomListProps) {
   return (
     <div css={css`padding: 0 24px;`}>
@@ -72,7 +75,7 @@ export function AvailableRoomList({ rooms, selectedRoomId, isLoading, onSelectRo
       )}
 
       <Spacing size={16} />
-      <Button display="full" onClick={onBook} disabled={isLoading}>
+      <Button display="full" onClick={onBook} disabled={isBookingDisabled(isLoading, selectedRoomId)}>
         {isLoading ? '예약 중...' : '확정'}
       </Button>
     </div>

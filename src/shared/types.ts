@@ -1,22 +1,6 @@
-export type Equipment = 'tv' | 'whiteboard' | 'video' | 'speaker';
+export type { Equipment, Room, Reservation } from '_tosslib/server/types';
 
-export interface Room {
-  id: string;
-  name: string;
-  floor: number;
-  capacity: number;
-  equipment: Equipment[];
-}
-
-export interface Reservation {
-  id: string;
-  roomId: string;
-  date: string;
-  start: string;
-  end: string;
-  attendees: number;
-  equipment: Equipment[];
-}
+import type { Equipment, Reservation } from '_tosslib/server/types';
 
 export interface CreateReservationRequest {
   roomId: string;
